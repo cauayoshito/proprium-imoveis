@@ -1,29 +1,26 @@
-// pages/planos.js
+// pages/planos.tsx
 import Head from "next/head";
-import Navbar from "../components/Navbar";
 import PricingSection from "../components/PricingSection";
 import FAQSection from "../components/FAQSection";
-import Footer from "../components/TestimonialsSection";
+import ContactSection from "../components/ContactSection";
 
 export default function PlanosPage() {
   return (
     <>
       <Head>
-        <title>Planos | Proprium Investimentos</title>
+        <title>Planos | Proprium</title>
         <meta
           name="description"
           content="Escolha o plano ideal para acessar e monitorar imóveis de leilão."
         />
       </Head>
 
-      <Navbar />
-
       <main className="pt-24">
         <PricingSection />
         <FAQSection />
       </main>
 
-      <Footer />
+      <ContactSection />
     </>
   );
 }

@@ -1,7 +1,9 @@
 # Ignorar node_modules e arquivos gerados
 node_modules
 .next
+*.tsbuildinfo
 .env
+.env*.local
 .DS_Store
 *.log
 npm-debug.log*

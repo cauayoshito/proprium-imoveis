@@ -1,4 +1,4 @@
-// pages/index.js
+// pages/index.tsx
 import Head from "next/head";
 import Hero from "../components/Hero";
 import AuctionSection from "../components/AuctionSection";
@@ -10,10 +10,10 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Malsa Investimentos</title>
+        <title>Proprium | Imóveis de leilão para investir</title>
         <meta
           name="description"
-          content="Invista com segurança em imóveis de leilão em Minas Gerais"
+          content="O Proprium reúne e organiza oportunidades de imóveis de leilão em Minas Gerais, com filtros, alertas e resumo de risco para investidores."
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>

@@ -1,7 +1,12 @@
-// components/FAQSection.js
+// components/FAQSection.tsx
 import { useState } from "react";
 
-const faqs = [
+type Faq = {
+  question: string;
+  answer: string;
+};
+
+const faqs: Faq[] = [
   {
     question: "Como faço para me cadastrar na plataforma?",
     answer:
@@ -25,7 +30,7 @@ const faqs = [
 ];
 
 export default function FAQSection() {
-  const [openIndex, setOpenIndex] = useState(null);
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
     <section id="faq" className="bg-gray-50 py-16">

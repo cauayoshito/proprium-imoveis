@@ -1,7 +1,15 @@
-// components/TestimonialsSection.js
+// components/TestimonialsSection.tsx
 import Image from "next/image";
 
-const depoimentos = [
+type Depoimento = {
+  id: number;
+  nome: string;
+  local: string;
+  texto: string;
+  avatar: string;
+};
+
+const depoimentos: Depoimento[] = [
   {
     id: 1,
     nome: "Alexandre Garbin",

@@ -1,8 +1,14 @@
-// components/PricingSection.js
+// components/PricingSection.tsx
 import Link from "next/link";
 
+type Plano = {
+  title: string;
+  price: string;
+  features: string[];
+};
+
 export default function PricingSection() {
-  const planos = [
+  const planos: Plano[] = [
     {
       title: "Básico",
       price: "R$ 49,90/mês",

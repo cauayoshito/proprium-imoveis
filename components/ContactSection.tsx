@@ -1,12 +1,13 @@
 import Image from "next/image";
+import Disclaimer from "./Disclaimer";
 
 export default function ContactSection() {
   return (
     <footer id="contato" className="bg-primary text-white py-12 text-center">
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-3xl mx-auto px-6">
         <Image
           src="/images/logo.png"
-          alt="Logo Proprium"
+          alt="Proprium"
           width={120}
           height={40}
           className="mx-auto mb-4"
@@ -32,9 +33,12 @@ export default function ContactSection() {
           <a href="#">YouTube</a>
         </div>
 
-        <p className="mt-8 text-gray-400">
-          © {new Date().getFullYear()} Proprium Investimentos - Todos os
-          direitos reservados
+        <div className="mt-8 border-t border-white/15 pt-6">
+          <Disclaimer className="text-gray-300" />
+        </div>
+
+        <p className="mt-6 text-gray-400">
+          © {new Date().getFullYear()} Proprium - Todos os direitos reservados
         </p>
       </div>
     </footer>

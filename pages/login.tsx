@@ -1,4 +1,4 @@
-// pages/login.js
+// pages/login.tsx
 import { useState } from "react";
 import Head from "next/head";
 import { signIn } from "next-auth/react";
@@ -7,7 +7,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     await signIn("credentials", { email, password, callbackUrl: "/" });
   };
@@ -15,7 +15,7 @@ export default function LoginPage() {
   return (
     <>
       <Head>
-        <title>Entrar | Proprium Investimentos</title>
+        <title>Entrar | Proprium</title>
       </Head>
       <div className="min-h-screen flex items-center justify-center bg-primary/10">
         <form
@@ -32,7 +32,9 @@ export default function LoginPage() {
           <input
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setEmail(e.target.value)
+            }
             placeholder="seu@exemplo.com"
             className="
               w-full mb-4 px-4 py-3
@@ -51,7 +53,9 @@ export default function LoginPage() {
           <input
             type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setPassword(e.target.value)
+            }
             placeholder="••••••••"
             className="
               w-full mb-6 px-4 py-3

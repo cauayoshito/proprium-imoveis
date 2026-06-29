@@ -1,4 +1,4 @@
-// components/Navbar.js
+// components/Navbar.tsx
 import Link from "next/link";
 import Image from "next/image";
 
@@ -9,9 +9,9 @@ export default function Navbar() {
         <Link href="/" className="inline-block">
           <Image
             src="/images/logo.png"
-            alt="Logo"
-            width={160} // largura da logo
-            height={48} // altura da logo
+            alt="Proprium"
+            width={160}
+            height={48}
             className="object-contain"
           />
         </Link>

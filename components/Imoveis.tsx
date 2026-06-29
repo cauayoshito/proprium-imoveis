@@ -1,13 +1,22 @@
-// components/Imoveis.js
+// components/Imoveis.tsx
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+
+type ImovelCard = {
+  id: number;
+  titulo: string;
+  valor: string;
+  tipo: string;
+  data: string;
+};
 
 export default function Imoveis() {
   const { data: session, status } = useSession();
   if (status === "loading")
     return <p className="p-8 text-center">Carregando imóveis…</p>;
 
-  const imoveis = [
+  // ⚠️ Dados de exemplo (placeholder). Substituídos pela ingestão real no Bloco 4.
+  const imoveis: ImovelCard[] = [
     {
       id: 1,
       titulo: "Casa em Salvador – Stiep",
@@ -29,7 +38,6 @@ export default function Imoveis() {
       tipo: "Terreno",
       data: "20/06/2025",
     },
-    // você pode adicionar mais…
   ];
 
   return (
@@ -49,16 +57,10 @@ export default function Imoveis() {
             <p className="text-xs text-gray-500 mb-4">Data: {item.data}</p>
 
             <Link
-              href={
-                session
-                  ? `/imoveis/${item.id}` // logado → detalhe
-                  : "/login" // não logado → login
-              }
-              legacyBehavior
+              href={session ? `/imoveis/${item.id}` : "/login"}
+              className="mt-auto block bg-accent text-white text-center px-4 py-2 rounded hover:bg-orange-700"
             >
-              <a className="mt-auto block bg-accent text-white text-center px-4 py-2 rounded hover:bg-orange-700">
-                Ver imóvel
-              </a>
+              Ver imóvel
             </Link>
           </div>
         ))}

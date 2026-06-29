@@ -1,12 +1,21 @@
-// components/AuctionSection.js
-
+// components/AuctionSection.tsx
 import { useState, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 
-// Exemplo de dados; substitua pelo seu array real
-const imoveis = [
+type ImovelLeilao = {
+  id: number;
+  titulo: string;
+  lance: string;
+  local: string;
+  data: string;
+  imagem: string;
+};
+
+// ⚠️ Dados de exemplo (placeholder). Serão substituídos pela ingestão real
+// de fontes oficiais/públicas de leilão no Bloco 4. Nada aqui é oferta real.
+const imoveis: ImovelLeilao[] = [
   {
     id: 1,
     titulo: "Casa em Salvador – Stiep",
@@ -31,12 +40,11 @@ const imoveis = [
     data: "20/06/2025",
     imagem: "/imoveis/feira.jpg",
   },
-  // … outros imóveis
 ];
 
 export default function AuctionSection() {
   // 1) Todos os Hooks devem vir primeiro:
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const [filtro, setFiltro] = useState("Todas");
   const cidades = useMemo(
     () => ["Todas", ...new Set(imoveis.map((i) => i.local))],
@@ -100,7 +108,7 @@ export default function AuctionSection() {
               <p className="text-gray-600 mt-1">Data: {item.data}</p>
 
               <Link
-                href={session ? `/imoveis/${item.id}` : "/login"}
+                href={`/imoveis/${item.id}`}
                 className="mt-auto bg-primary text-white py-2 rounded hover:bg-blue-900 text-center"
               >
                 Ver imóvel

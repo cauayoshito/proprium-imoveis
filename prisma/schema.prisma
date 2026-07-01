@@ -1,0 +1,249 @@
+// Proprium — schema do banco (PostgreSQL / Neon)
+// Bloco 1. Migrations são aplicadas a partir de uma máquina que alcance o Neon:
+//   npx prisma migrate dev --name init   (desenvolvimento)
+//   npx prisma migrate deploy            (produção/CI)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum SourceType {
+  OFICIAL // ex.: Caixa Econômica Federal
+  LEILOEIRO // leiloeiro oficial credenciado
+}
+
+enum PropertyType {
+  APARTAMENTO
+  CASA
+  TERRENO
+  COMERCIAL
+  RURAL
+  GARAGEM
+  OUTRO
+}
+
+// Natureza jurídica do leilão. Mantemos OUTRO para formatos não mapeados,
+// evitando perder dados de fontes que descrevem a modalidade de forma livre.
+enum AuctionModality {
+  JUDICIAL
+  EXTRAJUDICIAL
+  VENDA_DIRETA
+  LICITACAO_ABERTA
+  OUTRO
+}
+
+enum Occupancy {
+  OCUPADO
+  DESOCUPADO
+  DESCONHECIDO
+}
+
+enum AlertChannel {
+  WHATSAPP
+  EMAIL
+}
+
+enum AlertStatus {
+  PENDENTE
+  ENVIADO
+  FALHOU
+}
+
+enum Plan {
+  BASICO
+  PRO
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  TRIAL
+  ATIVA
+  INADIMPLENTE
+  CANCELADA
+}
+
+// ---------------------------------------------------------------------------
+// Modelos
+// ---------------------------------------------------------------------------
+
+model User {
+  id               String          @id @default(cuid())
+  email            String          @unique
+  passwordHash     String
+  nome             String?
+  // Telefone (formato E.164, ex.: +5531999998888) usado para alertas WhatsApp.
+  telefoneWhatsapp String?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  searchProfiles SearchProfile[]
+  alerts         Alert[]
+  subscription   Subscription?
+
+  @@map("users")
+}
+
+// Fonte de onde o imóvel foi captado. Guardamos a confirmação de que o ToS e o
+// robots.txt foram verificados, para respeitar as regras de cada fonte.
+model Source {
+  id        String     @id @default(cuid())
+  nome      String
+  tipo      SourceType
+  url       String
+  robotsOk  Boolean    @default(false)
+  tosOk     Boolean    @default(false)
+  ativo     Boolean    @default(true)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  properties Property[]
+
+  @@map("sources")
+}
+
+model Property {
+  id         String @id @default(cuid())
+  // Identificador do imóvel na fonte de origem (para deduplicar na ingestão).
+  externalId String
+  sourceId   String
+
+  titulo    String
+  descricao String?
+
+  tipo       PropertyType
+  modalidade AuctionModality
+
+  cidade   String
+  uf       String  @db.Char(2)
+  bairro   String?
+  endereco String?
+
+  valorAvaliacao      Decimal?  @db.Decimal(14, 2)
+  valorLance          Decimal?  @db.Decimal(14, 2)
+  descontoPct         Float?
+  areaM2              Float?
+  ocupacao            Occupancy @default(DESCONHECIDO)
+  aceitaFinanciamento Boolean?
+
+  dataLeilao DateTime?
+
+  // Link para o EDITAL original e para a página da fonte (transparência/legal).
+  editalUrl  String?
+  detalheUrl String?
+  imagemUrl  String?
+
+  ativo     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  source       Source        @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  riskAnalysis RiskAnalysis?
+  alerts       Alert[]
+
+  // Um mesmo imóvel não deve ser duplicado dentro da mesma fonte.
+  @@unique([sourceId, externalId])
+  @@index([cidade, uf])
+  @@index([dataLeilao])
+  @@map("properties")
+}
+
+// Resultado do serviço de IA (regras + NLP em Python). Mantém os trechos-fonte
+// e a versão do extrator para tornar o resumo de risco EXPLICÁVEL e auditável.
+model RiskAnalysis {
+  id         String @id @default(cuid())
+  propertyId String @unique
+
+  ocupacao            Occupancy @default(DESCONHECIDO)
+  aceitaFinanciamento Boolean?
+  // Lista de dívidas detectadas: [{ tipo, valor, descricao }]
+  dividas             Json      @default("[]")
+  resumo              String?
+  // Trechos do edital que embasam cada campo: [{ campo, trecho, pagina }]
+  trechosFonte        Json      @default("[]")
+  confianca           Float?
+  // Versão do extrator que gerou esta análise (rastreabilidade).
+  extractorVersion    String
+  geradoEm            DateTime  @default(now())
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@map("risk_analyses")
+}
+
+// Perfil de busca salvo pelo usuário; base para casar novos imóveis e disparar
+// alertas. Todos os critérios são opcionais (filtro só aplica os preenchidos).
+model SearchProfile {
+  id     String @id @default(cuid())
+  userId String
+
+  nome        String?
+  cidade      String?
+  uf          String?          @db.Char(2)
+  tipo        PropertyType?
+  modalidade  AuctionModality?
+  ocupacao    Occupancy?
+  descontoMin Float?
+  valorMax    Decimal?         @db.Decimal(14, 2)
+
+  ativo     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  alerts Alert[]
+
+  @@index([userId])
+  @@map("search_profiles")
+}
+
+model Alert {
+  id              String @id @default(cuid())
+  userId          String
+  propertyId      String
+  searchProfileId String
+
+  canal     AlertChannel @default(WHATSAPP)
+  status    AlertStatus  @default(PENDENTE)
+  enviadoEm DateTime?
+  erro      String?
+  createdAt DateTime     @default(now())
+
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  property      Property      @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  searchProfile SearchProfile @relation(fields: [searchProfileId], references: [id], onDelete: Cascade)
+
+  // Evita disparar o mesmo imóvel duas vezes para o mesmo perfil.
+  @@unique([searchProfileId, propertyId])
+  @@index([userId])
+  @@index([status])
+  @@map("alerts")
+}
+
+model Subscription {
+  id     String @id @default(cuid())
+  userId String @unique
+
+  plano  Plan               @default(BASICO)
+  status SubscriptionStatus @default(TRIAL)
+
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  periodoInicio        DateTime?
+  periodoFim           DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
+}

@@ -85,7 +85,10 @@ O trabalho é feito em **blocos pequenos**, com validação a cada etapa.
 - [x] **Bloco 2 — Autenticação própria** (JWT em cookie httpOnly + bcrypt):
       rotas `/api/auth/{register,login,logout,me}`, páginas de login/cadastro
       e remoção do next-auth.
-- [ ] **Bloco 3 — Busca + filtros reais + página de detalhe** lendo do banco.
+- [x] **Bloco 3 — Busca + filtros reais + página de detalhe** lendo do banco:
+      `/imoveis` (cidade, tipo, modalidade, ocupação, desconto mínimo, valor
+      máximo, busca textual, paginação) e `/imoveis/[id]` com link para o
+      edital original e seção de resumo de risco.
 - [ ] **Bloco 4 — Ingestão/normalização** de 3–5 fontes (Caixa + leiloeiros),
       respeitando ToS/robots e preferindo fontes oficiais/públicas.
 - [ ] **Bloco 5 — Resumo de risco** do edital via microserviço Python/FastAPI

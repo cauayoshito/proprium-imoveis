@@ -91,8 +91,11 @@ O trabalho é feito em **blocos pequenos**, com validação a cada etapa.
       edital original e seção de resumo de risco.
 - [ ] **Bloco 4 — Ingestão/normalização** de 3–5 fontes (Caixa + leiloeiros),
       respeitando ToS/robots e preferindo fontes oficiais/públicas.
-- [ ] **Bloco 5 — Resumo de risco** do edital via microserviço Python/FastAPI
-      (regras + NLP clássico, sem cloud API).
+- [x] **Bloco 5 — Resumo de risco** do edital via microserviço Python/FastAPI
+      ([`services/risk-analyzer`](services/risk-analyzer)): regras + regex
+      explicáveis (citam o trecho-fonte), endpoints de texto e PDF, testes.
+      Pendente: persistir o resultado em `RiskAnalysis` durante a ingestão
+      (Bloco 4).
 - [ ] **Bloco 6 — Perfil de busca → alerta por WhatsApp.**
 - [ ] **Bloco 7 — Paywall + assinatura** (Stripe / Pix).
 
@@ -100,9 +103,11 @@ O trabalho é feito em **blocos pequenos**, com validação a cada etapa.
 
 ```
 components/   Componentes React (UI)
-pages/        Rotas (Pages Router) e, futuramente, /pages/api
-lib/          Utilitários compartilhados (ex.: cliente Prisma)
+pages/        Rotas (Pages Router) e API routes (/pages/api)
+lib/          Utilitários compartilhados (Prisma, auth, formatação)
 prisma/       schema.prisma, migrations e seed
+services/     Microserviços (risk-analyzer: FastAPI de resumo de risco)
+types/        Tipos de transporte compartilhados
 public/       Imagens estáticas
 styles/       CSS global (Tailwind)
 ```

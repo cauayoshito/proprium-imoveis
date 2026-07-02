@@ -82,8 +82,9 @@ O trabalho é feito em **blocos pequenos**, com validação a cada etapa.
 - [~] **Bloco 1 — Schema:** modelagem do banco com Prisma (usuários, fontes,
       imóveis, análise de risco, perfis de busca, alertas, assinaturas). Schema
       pronto; a migration é aplicada localmente (ver "Banco de dados").
-- [ ] **Bloco 2 — Autenticação própria** (JWT + bcrypt) substituindo o login
-      atual.
+- [x] **Bloco 2 — Autenticação própria** (JWT em cookie httpOnly + bcrypt):
+      rotas `/api/auth/{register,login,logout,me}`, páginas de login/cadastro
+      e remoção do next-auth.
 - [ ] **Bloco 3 — Busca + filtros reais + página de detalhe** lendo do banco.
 - [ ] **Bloco 4 — Ingestão/normalização** de 3–5 fontes (Caixa + leiloeiros),
       respeitando ToS/robots e preferindo fontes oficiais/públicas.

@@ -2,7 +2,6 @@
 import { useState, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
 
 type ImovelLeilao = {
   id: number;
@@ -43,8 +42,6 @@ const imoveis: ImovelLeilao[] = [
 ];
 
 export default function AuctionSection() {
-  // 1) Todos os Hooks devem vir primeiro:
-  const { status } = useSession();
   const [filtro, setFiltro] = useState("Todas");
   const cidades = useMemo(
     () => ["Todas", ...new Set(imoveis.map((i) => i.local))],
@@ -56,12 +53,6 @@ export default function AuctionSection() {
     [filtro]
   );
 
-  // 2) Early return para loading
-  if (status === "loading") {
-    return <p className="p-8 text-center">Carregando imóveis…</p>;
-  }
-
-  // 3) Render principal
   return (
     <section id="imoveis" className="scroll-mt-24 px-6 py-16 bg-gray-50">
       <h2 className="text-3xl font-bold text-center mb-8 text-primary">
